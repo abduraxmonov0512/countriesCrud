@@ -3,12 +3,11 @@ package countryCRUD.countrCrud.models;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Data
+@MappedSuperclass
 @NoArgsConstructor
 public class BaseEntity {
     @Column(insertable = true, updatable = false)
@@ -17,11 +16,11 @@ public class BaseEntity {
 
     @PrePersist
     void onCreate(){
-        this.created = LocalDateTime.now();
-        this.modified = LocalDateTime.now();
+        this.setCreated(LocalDateTime.now());
+        this.setModified(LocalDateTime.now());
     }
     @PreUpdate
     void onUpdate(){
-        this.modified = LocalDateTime.now();
+        this.setModified(LocalDateTime.now());
     }
 }

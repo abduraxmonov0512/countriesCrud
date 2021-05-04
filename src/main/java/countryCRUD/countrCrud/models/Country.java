@@ -3,6 +3,7 @@ package countryCRUD.countrCrud.models;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.validator.constraints.UniqueElements;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -19,6 +20,7 @@ public class Country extends BaseEntity{
     private long id;
     @NotNull
     @NotBlank
+    @Column(unique = true)
     private String country;
 
     public Country(String country){
