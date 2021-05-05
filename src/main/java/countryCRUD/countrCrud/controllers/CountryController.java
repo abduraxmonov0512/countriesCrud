@@ -43,12 +43,11 @@ public class CountryController {
 
     }
 
-    @PutMapping("/county/{id}")
+    @PutMapping("/country")
     public ResponseEntity<?> updateCountry(@Valid @RequestBody Country country, Errors errors){
         if(errors.hasErrors()){
             return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(errors));
         }
-
         Optional<Country> country1 = countryRepository.findById(country.getId());
         if(country1.isEmpty()){
             return ResponseEntity.notFound().build();
@@ -59,5 +58,10 @@ public class CountryController {
         return ResponseEntity.ok().body(country1.get());
     }
 
+    @DeleteMapping("/country/{id}")
+    public ResponseEntity<Country> deleteCountry(@PathVariable Long id){
+        countryRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 
 }
