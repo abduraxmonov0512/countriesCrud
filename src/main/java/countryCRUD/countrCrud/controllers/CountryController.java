@@ -2,8 +2,10 @@ package countryCRUD.countrCrud.controllers;
 
 import countryCRUD.countrCrud.Factories.ValidationErrorBuilder;
 import countryCRUD.countrCrud.Repository.CountryRepository;
+import countryCRUD.countrCrud.errors.ValidationError;
 import countryCRUD.countrCrud.models.Country;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -64,4 +66,11 @@ public class CountryController {
         return ResponseEntity.noContent().build();
     }
 
+
+    @ExceptionHandler
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ValidationError handleException(Exception e){
+        System.out.println("Vot tut oshibka");
+        return new ValidationError(e.getMessage());
+    }
 }

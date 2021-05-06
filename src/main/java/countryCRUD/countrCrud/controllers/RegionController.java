@@ -3,9 +3,11 @@ package countryCRUD.countrCrud.controllers;
 import countryCRUD.countrCrud.Repository.CountryRepository;
 import countryCRUD.countrCrud.Repository.RegionRepository;
 import countryCRUD.countrCrud.dto.RegionDTO;
+import countryCRUD.countrCrud.errors.ValidationError;
 import countryCRUD.countrCrud.models.Country;
 import countryCRUD.countrCrud.models.Region;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -73,5 +75,12 @@ public class RegionController {
     public ResponseEntity<?> deleteById(@PathVariable Long id){
         regionRepository.deleteById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ValidationError handleException(Exception e){
+        System.out.println("Vot tut oshibka");
+        return new ValidationError(e.getMessage());
     }
 }

@@ -4,9 +4,11 @@ import countryCRUD.countrCrud.Factories.ValidationErrorBuilder;
 import countryCRUD.countrCrud.Repository.DistrictRepository;
 import countryCRUD.countrCrud.Repository.RegionRepository;
 import countryCRUD.countrCrud.dto.DisctrictDTO;
+import countryCRUD.countrCrud.errors.ValidationError;
 import countryCRUD.countrCrud.models.District;
 import countryCRUD.countrCrud.models.Region;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +50,13 @@ public class DistrictController {
     public ResponseEntity<Iterable<District>> getAllDistricts(){
         Iterable<District> districts = districtRepository.findAll();
         return ResponseEntity.ok(districts);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ValidationError handleException(Exception e){
+        System.out.println("Vot tut oshibka");
+        return new ValidationError(e.getMessage());
     }
 
 }
