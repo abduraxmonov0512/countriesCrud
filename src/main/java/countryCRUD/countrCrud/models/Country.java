@@ -1,5 +1,6 @@
 package countryCRUD.countrCrud.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -14,11 +15,12 @@ import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
+//@JsonIgnoreProperties({"hibernateLazyInitializer"})
 @Entity
 @NoArgsConstructor
 public class Country extends BaseEntity{
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @NotNull
     @NotBlank

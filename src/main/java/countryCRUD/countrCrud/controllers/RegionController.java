@@ -37,4 +37,41 @@ public class RegionController {
     }
 
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Region> getRegionById(@PathVariable Long id){
+        Optional<Region> region = regionRepository.findById(id);
+        if(region.isEmpty())
+            return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok().body(region.get());
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Iterable<Region>> getAllRegions(){
+//        Iterable<Region> regions =  regionRepository.findAll();
+//        if(!regions.iterator().hasNext()){
+//            return ResponseEntity.notFound().build();
+//        }
+
+        return  ResponseEntity.ok().body(regionRepository.findAll());
+    }
+
+    @PutMapping()
+    public ResponseEntity<Region> updateRegion(@RequestBody Region region) {
+        Optional<Region> result = regionRepository.findById(region.getId());
+
+        if(result.isEmpty()){
+            ResponseEntity.notFound().build();
+        }
+        result.get().setRegion(region.getRegion());
+
+
+       return ResponseEntity.ok().body(regionRepository.save(result.get()));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteById(@PathVariable Long id){
+        regionRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 }
