@@ -2,25 +2,31 @@ package countryCRUD.countrCrud.controllers;
 
 import countryCRUD.countrCrud.Factories.ValidationErrorBuilder;
 import countryCRUD.countrCrud.Repository.CountryRepository;
-import countryCRUD.countrCrud.errors.ValidationError;
+import countryCRUD.countrCrud.dto.CountryWithRegionDto;
+import countryCRUD.countrCrud.response.ErrorResponse;
 import countryCRUD.countrCrud.models.Country;
+import countryCRUD.countrCrud.response.SuccessResponse;
+import countryCRUD.countrCrud.service.CountryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
 public class CountryController {
     private CountryRepository countryRepository;
+    private CountryService countryService;
 
     @Autowired
-    public CountryController(CountryRepository countryRepository) {
+    public CountryController(CountryRepository countryRepository, CountryService countryService) {
         this.countryRepository = countryRepository;
+        this.countryService = countryService;
     }
 
     @GetMapping("/countries")
@@ -29,13 +35,13 @@ public class CountryController {
     }
 
     @GetMapping("/country/{id}")
-    public ResponseEntity<Country> getCountryById(@PathVariable Long id){
-        Optional<Country> country = countryRepository.findById(id);
-        return country.map(value -> ResponseEntity.ok().body(value)).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<SuccessResponse> getCountryById(@PathVariable Long id){
+
+        return ResponseEntity.ok().body(countryService.getAllRegionByCountryId(id));
     }
 
     @PostMapping("/country/addCountry")
-    public ResponseEntity<?> addCountry(@Valid @RequestBody Country country, Errors errors){
+    public ResponseEntity<?> addCountry(@Valid @RequestBody Country country, BindingResult errors){
 
         if(errors.hasErrors()){
             return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(errors));
@@ -46,8 +52,9 @@ public class CountryController {
     }
 
     @PutMapping("/country")
-    public ResponseEntity<?> updateCountry(@Valid @RequestBody Country country, Errors errors){
+    public ResponseEntity<?> updateCountry(@Valid @RequestBody Country country, BindingResult errors){
         if(errors.hasErrors()){
+            System.out.println("TEEEEEEEEEEEEEEEEEEEEEEEEST");
             return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(errors));
         }
         Optional<Country> country1 = countryRepository.findById(country.getId());
@@ -69,8 +76,11 @@ public class CountryController {
 
     @ExceptionHandler
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ValidationError handleException(Exception e){
-        System.out.println("Vot tut oshibka");
-        return new ValidationError(e.getMessage());
+    public ErrorResponse handleException(Exception e){
+        System.out.println("Vot tut oshibka1" + e.getLocalizedMessage());
+        System.out.println("Vot tut oshibka2" + e.getCause());
+        System.out.println("Vot tut oshibka3" + Arrays.toString(e.getSuppressed()));
+
+        return new ErrorResponse(e.getMessage());
     }
 }

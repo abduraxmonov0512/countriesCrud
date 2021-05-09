@@ -1,16 +1,21 @@
 package countryCRUD.countrCrud.controllers;
 
+import countryCRUD.countrCrud.Factories.ValidationErrorBuilder;
 import countryCRUD.countrCrud.Repository.CountryRepository;
 import countryCRUD.countrCrud.Repository.RegionRepository;
 import countryCRUD.countrCrud.dto.RegionDTO;
-import countryCRUD.countrCrud.errors.ValidationError;
 import countryCRUD.countrCrud.models.Country;
 import countryCRUD.countrCrud.models.Region;
+import countryCRUD.countrCrud.response.ErrorResponse;
+import countryCRUD.countrCrud.response.SuccessResponse;
+import countryCRUD.countrCrud.service.RegionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
@@ -18,15 +23,20 @@ import java.util.Optional;
 public class RegionController {
     private RegionRepository regionRepository;
     private CountryRepository countryRepository;
+    private RegionService regionService;
 
     @Autowired
-    public RegionController(RegionRepository regionRepository, CountryRepository countryRepository) {
+    public RegionController(RegionRepository regionRepository, CountryRepository countryRepository, RegionService regionService) {
         this.regionRepository = regionRepository;
         this.countryRepository = countryRepository;
+        this.regionService = regionService;
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Region> addRegion(@RequestBody RegionDTO region){
+    public ResponseEntity<?> addRegion(@Valid @RequestBody RegionDTO region, BindingResult error){
+        if(error.hasErrors()){
+            return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(error));
+        }
         Optional<Country> optionalCountry = countryRepository.findById(region.getCountry_id());
         if(optionalCountry.isEmpty()){
             ResponseEntity.notFound().build();
@@ -40,12 +50,10 @@ public class RegionController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<Region> getRegionById(@PathVariable Long id){
-        Optional<Region> region = regionRepository.findById(id);
-        if(region.isEmpty())
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<SuccessResponse> getRegionById(@PathVariable Long id){
 
-        return ResponseEntity.ok().body(region.get());
+
+        return ResponseEntity.ok().body(regionService.getAllDistrictsRegion(id));
     }
 
     @GetMapping("/all")
@@ -79,8 +87,10 @@ public class RegionController {
 
     @ExceptionHandler
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ValidationError handleException(Exception e){
-        System.out.println("Vot tut oshibka");
-        return new ValidationError(e.getMessage());
+    public ErrorResponse handleException(Exception e){
+        System.out.println("Vot tut oshibka1" + e.getLocalizedMessage());
+        System.out.println("Vot tut oshibka2"  + e.getCause());
+
+        return new ErrorResponse(e.getMessage());
     }
 }

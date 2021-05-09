@@ -3,14 +3,14 @@ package countryCRUD.countrCrud.controllers;
 import countryCRUD.countrCrud.Factories.ValidationErrorBuilder;
 import countryCRUD.countrCrud.Repository.DistrictRepository;
 import countryCRUD.countrCrud.Repository.RegionRepository;
-import countryCRUD.countrCrud.dto.DisctrictDTO;
-import countryCRUD.countrCrud.errors.ValidationError;
+import countryCRUD.countrCrud.dto.DistrictDTO;
 import countryCRUD.countrCrud.models.District;
 import countryCRUD.countrCrud.models.Region;
+import countryCRUD.countrCrud.response.ErrorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -29,10 +29,14 @@ public class DistrictController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<?> addDistrict(@RequestBody DisctrictDTO district){
+    public ResponseEntity<?> addDistrict(@Valid @RequestBody DistrictDTO district, BindingResult errors){
+       if(errors.hasErrors()){
+           return ResponseEntity.badRequest().body(ValidationErrorBuilder.fromBindingErrors(errors));
+       }
+
         Region region = regionRepository.findById(district.getRegion_id()).get();
         District result = new District();
-        result.setDistrict(district.getDisctrict());
+        result.setDistrict(district.getDistrict());
         result.setRegion(region);
         return  ResponseEntity.ok().body(districtRepository.save(result));
     }
@@ -54,9 +58,9 @@ public class DistrictController {
 
     @ExceptionHandler
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    public ValidationError handleException(Exception e){
+    public ErrorResponse handleException(Exception e){
         System.out.println("Vot tut oshibka");
-        return new ValidationError(e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
 
 }

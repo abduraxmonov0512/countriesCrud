@@ -1,17 +1,17 @@
 package countryCRUD.countrCrud.dto;
 
-import lombok.Data;
-import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
+import lombok.Data;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 @Data
-public class RegionDTO {
+public class DistrictDTO {
     @NotNull
-    private long country_id;
+    private long region_id;
+
     @NotNull
     @NotBlank
-    private String region;
+    private String district;
 }

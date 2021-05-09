@@ -1,19 +1,24 @@
 package countryCRUD.countrCrud.Factories;
 
 
-import countryCRUD.countrCrud.errors.ValidationError;
-import org.springframework.validation.Errors;
-import org.springframework.validation.ObjectError;
+
+import countryCRUD.countrCrud.response.ErrorResponse;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ValidationErrorBuilder {
 
-    public static ValidationError fromBindingErrors(Errors errors){
-        ValidationError error = new ValidationError("Validation failed. " +
-                errors.getErrorCount() + " error(s)");
+    public static ErrorResponse fromBindingErrors(BindingResult errors){
+        ErrorResponse errorResponse = new ErrorResponse("Ошибка валидации. Количество ошибок " +
+                errors.getErrorCount());
 
-        for(ObjectError objectError : errors.getAllErrors()){
-            error.addValidationError(objectError.getDefaultMessage());
+        List<FieldError> list = errors.getFieldErrors();
+        for(FieldError objectError : list){
+            errorResponse.addValidationError(objectError.getField() + ": " + objectError.getDefaultMessage());
         }
-        return  error;
+        return  errorResponse;
     }
 }
